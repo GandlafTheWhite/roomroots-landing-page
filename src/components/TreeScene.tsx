@@ -1,52 +1,278 @@
-import { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import TreeCharacter from './TreeCharacter';
+import { motion } from 'framer-motion';
 
 interface TreeSceneProps {
   emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
 }
 
-function Loader() {
-  return (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-950 to-slate-900">
-      <div className="text-center">
-        <div className="text-9xl mb-8 animate-bounce">🌿</div>
-        <p className="text-white/40 text-sm">Загружаю дерево...</p>
-      </div>
-    </div>
-  );
-}
-
 export default function TreeScene({ emotion }: TreeSceneProps) {
+  const getAnimationProps = () => {
+    switch (emotion) {
+      case 'greeting':
+        return {
+          rotate: [0, -10, 10, -5, 0],
+          scale: [1, 1.05, 1],
+          transition: { duration: 0.6, repeat: 2 }
+        };
+      case 'thinking':
+        return {
+          rotate: [0, 5, -5, 0],
+          transition: { duration: 2, repeat: Infinity }
+        };
+      case 'happy':
+        return {
+          y: [0, -20, 0],
+          scale: [1, 1.1, 1],
+          transition: { duration: 0.5, repeat: 3 }
+        };
+      case 'presenting':
+        return {
+          rotateY: [0, 360],
+          scale: [1, 1.15, 1],
+          transition: { duration: 1.5 }
+        };
+      default:
+        return {
+          y: [0, -5, 0],
+          rotate: [0, 2, -2, 0],
+          transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
+        };
+    }
+  };
+
   return (
-    <div className="w-full h-full" style={{ background: 'linear-gradient(to bottom right, #020617, #0f172a)' }}>
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
-        shadows
-        gl={{ antialias: true, alpha: false }}
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
+      {/* Фоновые частицы */}
+      <div className="absolute inset-0 opacity-20">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-emerald-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.2, 0.8, 0.2],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Свечение под деревом */}
+      <motion.div
+        className="absolute bottom-1/3 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+
+      {/* Дерево */}
+      <motion.div
+        className="relative z-10"
+        {...getAnimationProps()}
       >
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.4} />
-          <directionalLight
-            position={[5, 5, 5]}
-            intensity={0.8}
-            castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
+        <svg
+          width="300"
+          height="400"
+          viewBox="0 0 300 400"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="drop-shadow-2xl"
+        >
+          {/* Корни - основание */}
+          <motion.path
+            d="M150 380 Q130 350 110 340 M150 380 Q170 350 190 340 M150 380 Q145 360 140 350 M150 380 Q155 360 160 350"
+            stroke="#3d2817"
+            strokeWidth="4"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.6 }}
+            transition={{ duration: 1.5 }}
           />
-          <pointLight position={[-5, 5, -5]} intensity={0.3} color="#9dff9d" />
-          
-          <TreeCharacter emotion={emotion} />
-          
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 1.5}
+
+          {/* Основной ствол - мох */}
+          <motion.ellipse
+            cx="150"
+            cy="280"
+            rx="50"
+            ry="60"
+            fill="#2d5016"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           />
-        </Suspense>
-      </Canvas>
+          
+          {/* Мохового покрова детали */}
+          <motion.circle cx="150" cy="280" r="45" fill="#4a7c59" opacity="0.9"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          />
+          <motion.circle cx="130" cy="270" r="20" fill="#5c8a4d" opacity="0.7"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.circle cx="170" cy="290" r="18" fill="#5c8a4d" opacity="0.7"
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ duration: 2.3, repeat: Infinity, delay: 0.5 }}
+          />
+
+          {/* Ветки */}
+          <motion.path
+            d="M120 260 Q90 240 70 220"
+            stroke="#3d2817"
+            strokeWidth="6"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          />
+          <motion.path
+            d="M180 260 Q210 240 230 220"
+            stroke="#3d2817"
+            strokeWidth="6"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          />
+          <motion.path
+            d="M140 240 Q110 210 90 180"
+            stroke="#3d2817"
+            strokeWidth="5"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          />
+          <motion.path
+            d="M160 240 Q190 210 210 180"
+            stroke="#3d2817"
+            strokeWidth="5"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+          />
+
+          {/* Листья/иголки на ветках */}
+          {[
+            { cx: 70, cy: 220, delay: 1 },
+            { cx: 230, cy: 220, delay: 1.1 },
+            { cx: 90, cy: 180, delay: 1.2 },
+            { cx: 210, cy: 180, delay: 1.3 },
+            { cx: 50, cy: 210, delay: 1.15 },
+            { cx: 250, cy: 210, delay: 1.25 },
+          ].map((leaf, i) => (
+            <motion.circle
+              key={i}
+              cx={leaf.cx}
+              cy={leaf.cy}
+              r="12"
+              fill="#5c8a4d"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ 
+                scale: 1, 
+                opacity: [0.6, 0.9, 0.6],
+                y: [0, -3, 0]
+              }}
+              transition={{ 
+                scale: { duration: 0.4, delay: leaf.delay },
+                opacity: { duration: 2, repeat: Infinity, delay: i * 0.2 },
+                y: { duration: 2.5, repeat: Infinity, delay: i * 0.3 }
+              }}
+            />
+          ))}
+
+          {/* Верхушка - крона */}
+          <motion.ellipse
+            cx="150"
+            cy="180"
+            rx="45"
+            ry="55"
+            fill="#4a7c59"
+            opacity="0.8"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 1 }}
+          />
+          <motion.circle
+            cx="150"
+            cy="160"
+            r="35"
+            fill="#5c8a4d"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 1.1 }}
+          />
+
+          {/* Маленькие листья вокруг */}
+          {[
+            { cx: 120, cy: 170, delay: 1.3 },
+            { cx: 180, cy: 170, delay: 1.35 },
+            { cx: 135, cy: 150, delay: 1.4 },
+            { cx: 165, cy: 150, delay: 1.45 },
+            { cx: 150, cy: 135, delay: 1.5 },
+          ].map((leaf, i) => (
+            <motion.circle
+              key={`top-${i}`}
+              cx={leaf.cx}
+              cy={leaf.cy}
+              r="8"
+              fill="#6fa05b"
+              initial={{ scale: 0 }}
+              animate={{ 
+                scale: [1, 1.2, 1],
+                opacity: [0.7, 1, 0.7]
+              }}
+              transition={{ 
+                scale: { duration: 0.3, delay: leaf.delay },
+                opacity: { duration: 1.8, repeat: Infinity, delay: i * 0.15 }
+              }}
+            />
+          ))}
+
+          {/* Светящиеся точки (споры мха) */}
+          {[
+            { cx: 145, cy: 280, delay: 1.6 },
+            { cx: 155, cy: 275, delay: 1.7 },
+            { cx: 148, cy: 290, delay: 1.8 },
+          ].map((spore, i) => (
+            <motion.circle
+              key={`spore-${i}`}
+              cx={spore.cx}
+              cy={spore.cy}
+              r="3"
+              fill="#9dff9d"
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: [0, 1, 0],
+                scale: [1, 1.5, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                delay: spore.delay
+              }}
+            />
+          ))}
+        </svg>
+      </motion.div>
+
+      {/* Текст эмоции (скрытый, для дебага) */}
+      {/* <div className="absolute bottom-4 text-white/20 text-xs">{emotion}</div> */}
     </div>
   );
 }
