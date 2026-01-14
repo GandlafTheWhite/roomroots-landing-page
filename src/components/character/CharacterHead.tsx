@@ -10,8 +10,8 @@ interface CharacterHeadProps {
 export default function CharacterHead({ emotion, eyes, mouthPath, isTalking = false }: CharacterHeadProps) {
   const getTalkingMouthPath = () => {
     if (emotion === 'happy') return mouthPath;
-    const baseY = 325;
-    return `M180 ${baseY} Q200 ${baseY + 8} 220 ${baseY}`;
+    const baseY = 345;
+    return `M210 ${baseY} Q230 ${baseY + 8} 250 ${baseY}`;
   };
   
   const talkingMouth = getTalkingMouthPath();
@@ -158,7 +158,7 @@ export default function CharacterHead({ emotion, eyes, mouthPath, isTalking = fa
             d: isTalking
               ? [mouthPath, talkingMouth, mouthPath]
               : emotion === 'happy' 
-                ? ['M160 325 Q200 350 240 325', 'M160 325 Q200 355 240 325', 'M160 325 Q200 350 240 325']
+                ? ['M190 345 Q230 370 270 345', 'M190 345 Q230 375 270 345', 'M190 345 Q230 370 270 345']
                 : [mouthPath]
           }}
           transition={{ 
