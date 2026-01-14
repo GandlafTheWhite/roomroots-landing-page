@@ -15,7 +15,7 @@ export default function ProductCard({ product, onTake, onAnother, onCustom }: Pr
       initial={{ opacity: 0, scale: 0.9, rotateY: 90 }}
       animate={{ opacity: 1, scale: 1, rotateY: 0 }}
       transition={{ duration: 0.8, type: 'spring' }}
-      className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-3xl overflow-hidden shadow-2xl max-h-[70vh] overflow-y-auto"
+      className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[65vh] sm:max-h-[70vh] overflow-y-auto"
     >
       <div className="aspect-square overflow-hidden">
         <img

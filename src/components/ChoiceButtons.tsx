@@ -39,11 +39,11 @@ export default function ChoiceButtons({ choices, layout = 'grid' }: ChoiceButton
   };
 
   const gridClass = layout === 'grid' 
-    ? 'grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3' 
+    ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3' 
     : 'flex flex-col gap-2 sm:gap-3';
 
   const getButtonClass = (variant?: string) => {
-    const baseClass = "w-full h-auto min-h-[3rem] sm:min-h-[3.5rem] flex flex-col gap-1 sm:gap-2 text-sm sm:text-base font-medium transition-all duration-300";
+    const baseClass = "w-full h-auto min-h-[2.75rem] sm:min-h-[3rem] md:min-h-[3.5rem] flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm md:text-base font-medium transition-all duration-300 active:scale-95";
     
     if (variant === 'outline') {
       return `${baseClass} bg-white/10 hover:bg-white/20 text-white border-2 border-emerald-500/40 hover:border-emerald-400/60 backdrop-blur-sm shadow-lg hover:shadow-emerald-500/20`;
@@ -59,7 +59,7 @@ export default function ChoiceButtons({ choices, layout = 'grid' }: ChoiceButton
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-3 sm:px-4 z-40"
+      className="fixed bottom-3 sm:bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl px-2 sm:px-3 md:px-4 z-40"
     >
       <div className={gridClass}>
         {choices.map((choice, index) => (

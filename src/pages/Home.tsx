@@ -139,7 +139,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full min-h-screen h-screen flex items-center justify-center overflow-hidden relative">
+    <div className="w-full min-h-screen h-screen flex items-center justify-center overflow-hidden relative touch-none">
       {/* Фон с деревом */}
       <div className="absolute inset-0 w-full h-full">
         <TreeScene emotion={emotion} isTalking={isTalking} />

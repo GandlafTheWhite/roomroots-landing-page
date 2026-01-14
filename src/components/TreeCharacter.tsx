@@ -108,16 +108,15 @@ export default function TreeCharacter({ emotion, isTalking = false }: TreeCharac
 
   return (
     <motion.div
-      className="relative w-full h-full flex items-center justify-center"
+      className="relative flex items-center justify-center w-full max-w-[90vw] sm:max-w-none"
       {...getAnimationProps()}
     >
       <svg
-        width="700"
-        height="1000"
         viewBox="0 0 500 700"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="drop-shadow-2xl scale-90"
+        className="drop-shadow-2xl w-full h-auto max-h-[70vh] sm:max-h-[80vh]"
+        preserveAspectRatio="xMidYMid meet"
       >
         <SVGDefinitions />
         <CharacterRoots />

@@ -35,11 +35,11 @@ export default function DialogueBubble({ message, show, children, onTypingChange
             damping: 15,
             duration: 0.6
           }}
-          className="fixed top-1/4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md sm:max-w-xl lg:max-w-2xl px-3 sm:px-4"
+          className="fixed top-[15%] sm:top-1/4 left-1/2 -translate-x-1/2 z-50 w-full max-w-[90%] sm:max-w-md md:max-w-xl lg:max-w-2xl px-3 sm:px-4"
         >
           {/* Облачко диалога с breathing эффектом */}
           <motion.div 
-            className="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-4 sm:p-6 max-h-[40vh] overflow-y-auto"
+            className="relative bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-2xl p-3 sm:p-4 md:p-6 max-h-[45vh] sm:max-h-[40vh] overflow-y-auto"
             animate={{ 
               y: [0, -3, 0],
               scale: [1, 1.005, 1]

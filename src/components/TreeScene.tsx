@@ -111,7 +111,7 @@ export default function TreeScene({ emotion, isTalking = false }: TreeSceneProps
       />
 
       {/* ПЕРСОНАЖ - Антропоморфный дух леса */}
-      <div className="relative z-10">
+      <div className="relative z-10 w-full h-full flex items-center justify-center">
         <TreeCharacter emotion={emotion} isTalking={isTalking} />
       </div>
 
