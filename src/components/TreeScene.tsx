@@ -1,57 +1,11 @@
 import { motion } from 'framer-motion';
+import TreeCharacter from './TreeCharacter';
 
 interface TreeSceneProps {
   emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
 }
 
 export default function TreeScene({ emotion }: TreeSceneProps) {
-  const getAnimationProps = () => {
-    switch (emotion) {
-      case 'greeting':
-        return {
-          rotate: [0, -10, 10, -5, 0],
-          scale: [1, 1.05, 1],
-          transition: { duration: 0.6, repeat: 2 }
-        };
-      case 'thinking':
-        return {
-          rotate: [0, 5, -5, 0],
-          transition: { duration: 2, repeat: Infinity }
-        };
-      case 'happy':
-        return {
-          y: [0, -20, 0],
-          scale: [1, 1.1, 1],
-          transition: { duration: 0.5, repeat: 3 }
-        };
-      case 'presenting':
-        return {
-          rotateY: [0, 360],
-          scale: [1, 1.15, 1],
-          transition: { duration: 1.5 }
-        };
-      default:
-        return {
-          y: [0, -5, 0],
-          rotate: [0, 2, -2, 0],
-          transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
-        };
-    }
-  };
-
-  // Глаза в зависимости от эмоции
-  const getEyes = () => {
-    switch (emotion) {
-      case 'happy':
-        return { leftY: 265, rightY: 265, shape: 'arc' }; // Закрытые улыбающиеся
-      case 'thinking':
-        return { leftY: 265, rightY: 265, shape: 'closed' }; // Закрытые глаза
-      default:
-        return { leftY: 265, rightY: 265, shape: 'normal' }; // Спокойные
-    }
-  };
-
-  const eyes = getEyes();
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
@@ -118,7 +72,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
         </svg>
       </div>
 
-      {/* Свечение под деревом */}
+      {/* Свечение под персонажем */}
       <motion.div
         className="absolute bottom-1/4 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-3xl"
         animate={{
@@ -132,11 +86,13 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
         }}
       />
 
-      {/* Дерево */}
-      <motion.div
-        className="relative z-10"
-        {...getAnimationProps()}
-      >
+      {/* ПЕРСОНАЖ - Антропоморфный дух леса */}
+      <div className="relative z-10">
+        <TreeCharacter emotion={emotion} />
+      </div>
+
+      {/* Старое дерево (удалить весь блок ниже) */}
+      {false && (
         <svg
           width="500"
           height="700"
@@ -428,7 +384,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
             />
           ))}
         </svg>
-      </motion.div>
+        )}
     </div>
   );
 }
