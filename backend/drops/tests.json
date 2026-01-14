@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "Get product drop with preferences",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "preferences": {
+          "mood": "calm",
+          "location": "home",
+          "size": "small",
+          "style": "warm"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "name": "string",
+        "available": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get product drop without preferences",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "preferences": {}
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "name": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

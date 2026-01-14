@@ -1,0 +1,114 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import type { UserPreferences } from '@/types/dialogue';
+
+interface ContactFormProps {
+  preferences: UserPreferences;
+  productName?: string;
+  onSuccess: () => void;
+}
+
+export default function ContactForm({ preferences, productName, onSuccess }: ContactFormProps) {
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!contact.trim()) {
+      setError('Укажите способ связи');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/f718a584-99f7-488f-be28-5dae5a638c7a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          contact: contact.trim(),
+          preferences,
+          message: message.trim() || (productName ? `Хочу заказать: ${productName}` : ''),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка отправки');
+      }
+
+      onSuccess();
+    } catch (err) {
+      setError('Не удалось отправить заявку. Попробуйте ещё раз.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
+      <div className="space-y-2">
+        <label className="text-white/80 text-sm">Как вас зовут?</label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Иван"
+          className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-white/80 text-sm">Телефон или Telegram *</label>
+        <Input
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          placeholder="+7 900 123-45-67 или @username"
+          required
+          className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-white/80 text-sm">Комментарий</label>
+        <Textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Любые пожелания..."
+          className="bg-white/5 border-white/20 text-white placeholder:text-white/40 min-h-[80px]"
+        />
+      </div>
+
+      {error && (
+        <p className="text-red-400 text-sm">{error}</p>
+      )}
+
+      <Button
+        type="submit"
+        size="lg"
+        disabled={loading}
+        className="w-full"
+      >
+        {loading ? 'Отправляю...' : 'Отправить заявку 🚀'}
+      </Button>
+
+      <p className="text-white/40 text-xs text-center">
+        Мы свяжемся с вами в течение дня
+      </p>
+    </motion.form>
+  );
+}

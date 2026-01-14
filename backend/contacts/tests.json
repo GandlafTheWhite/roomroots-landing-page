@@ -1,0 +1,39 @@
+{
+  "tests": [
+    {
+      "name": "Submit contact request",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Иван",
+        "contact": "@ivan_test",
+        "preferences": {
+          "mood": "calm",
+          "location": "home",
+          "size": "small",
+          "style": "warm"
+        },
+        "message": "Хочу заказать"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Submit without contact",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Петр",
+        "message": "Интересуюсь"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "Contact is required"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
