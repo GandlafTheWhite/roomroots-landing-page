@@ -87,19 +87,19 @@ export default function TreeCharacter({ emotion, isTalking = false }: TreeCharac
   const getMouth = () => {
     switch (emotion) {
       case 'happy':
-        return 'M190 345 Q230 370 270 345';
+        return 'M210 345 Q250 370 290 345';
       case 'thinking':
-        return 'M205 345 Q230 352 255 345';
+        return 'M225 345 Q250 352 275 345';
       case 'greeting':
-        return 'M200 345 Q230 360 260 345';
+        return 'M220 345 Q250 360 280 345';
       case 'surprised':
-        return 'M215 350 Q230 360 245 350';
+        return 'M235 350 Q250 360 265 350';
       case 'sad':
-        return 'M205 350 Q230 340 255 350';
+        return 'M225 350 Q250 340 275 350';
       case 'excited':
-        return 'M195 345 Q230 365 265 345';
+        return 'M215 345 Q250 365 285 345';
       default:
-        return 'M205 345 Q230 355 255 345';
+        return 'M225 345 Q250 355 275 345';
     }
   };
 
