@@ -1,6 +1,6 @@
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { OrbitControls, ContactShadows } from '@react-three/drei';
 import TreeCharacter from './TreeCharacter';
 
 interface TreeSceneProps {
@@ -9,28 +9,28 @@ interface TreeSceneProps {
 
 export default function TreeScene({ emotion }: TreeSceneProps) {
   return (
-    <div className="w-full h-full">
+    <div style={{ width: '100%', height: '100%', background: '#0a0e0d' }}>
       <Canvas
         camera={{ position: [0, 1, 3], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]}
       >
         <color attach="background" args={['#0a0e0d']} />
         
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={0.5} castShadow />
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[5, 5, 5]} intensity={0.6} />
         <pointLight position={[-3, 2, -3]} intensity={0.3} color="#ff9d5c" />
         
-        <TreeCharacter emotion={emotion} />
-        
-        <ContactShadows
-          position={[0, -0.5, 0]}
-          opacity={0.4}
-          scale={3}
-          blur={2}
-          far={1}
-        />
-        
-        <Environment preset="forest" />
+        <Suspense fallback={null}>
+          <TreeCharacter emotion={emotion} />
+          
+          <ContactShadows
+            position={[0, -0.5, 0]}
+            opacity={0.4}
+            scale={3}
+            blur={2}
+            far={1}
+          />
+        </Suspense>
         
         <OrbitControls
           enableZoom={false}
@@ -40,14 +40,6 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
           minAzimuthAngle={-Math.PI / 4}
           maxAzimuthAngle={Math.PI / 4}
         />
-        
-        <EffectComposer>
-          <Bloom
-            intensity={0.5}
-            luminanceThreshold={0.9}
-            luminanceSmoothing={0.9}
-          />
-        </EffectComposer>
       </Canvas>
     </div>
   );

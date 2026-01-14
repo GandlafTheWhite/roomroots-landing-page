@@ -1,6 +1,5 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { MeshWobbleMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface TreeCharacterProps {
@@ -109,10 +108,8 @@ export default function TreeCharacter({ emotion }: TreeCharacterProps) {
 
       <mesh ref={mossRef} position={[0, 0, 0]}>
         <dodecahedronGeometry args={[0.45, 1]} />
-        <MeshWobbleMaterial
+        <meshStandardMaterial
           color="#4a7c59"
-          speed={0.5}
-          factor={0.2}
           roughness={1}
           metalness={0}
         />

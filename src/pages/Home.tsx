@@ -364,11 +364,11 @@ export default function Home() {
 
   return (
     <div className="w-full h-screen flex">
-      <div className="w-3/5 h-full">
+      <div className="w-3/5 h-full bg-gradient-to-br from-slate-950 to-slate-900">
         <TreeScene emotion={emotion} />
       </div>
 
-      <div className="w-2/5 h-full flex items-center justify-center p-12 bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="w-2/5 h-full flex items-center justify-center p-12 bg-gradient-to-br from-slate-900 to-slate-800 overflow-y-auto">
         <div className="w-full max-w-lg">
           <AnimatePresence mode="wait">
             {step === 'welcome' && renderWelcome()}
