@@ -42,7 +42,7 @@ export default function DialogueBubble({ message, show, children, onTypingChange
             damping: 20,
             duration: 0.7
           }}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[85vw] max-w-md sm:max-w-lg md:max-w-xl"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100vw-2rem)] max-w-[340px] sm:max-w-md md:max-w-lg px-2"
           style={{ perspective: '1000px' }}
         >
           {/* Декоративное свечение */}
@@ -61,7 +61,7 @@ export default function DialogueBubble({ message, show, children, onTypingChange
 
           {/* Облачко диалога */}
           <motion.div 
-            className="relative bg-gradient-to-br from-white via-white to-emerald-50/30 backdrop-blur-md rounded-[1.75rem] shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-2 border-white/60 p-4 sm:p-5 md:p-6 overflow-hidden"
+            className="relative bg-gradient-to-br from-white via-white to-emerald-50/30 backdrop-blur-md rounded-[1.75rem] shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-2 border-white/60 p-5 sm:p-6 md:p-7 overflow-hidden"
             animate={{ 
               y: [0, -6, 0],
               rotateZ: [0, 0.5, -0.5, 0]
