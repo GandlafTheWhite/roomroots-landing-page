@@ -1,13 +1,23 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
+import { useTypewriter } from '@/hooks/useTypewriter';
 
 interface DialogueBubbleProps {
   message: string;
   show: boolean;
   children?: ReactNode;
+  onTypingChange?: (isTyping: boolean) => void;
 }
 
-export default function DialogueBubble({ message, show, children }: DialogueBubbleProps) {
+export default function DialogueBubble({ message, show, children, onTypingChange }: DialogueBubbleProps) {
+  const { displayedText, isTyping } = useTypewriter(message, { 
+    speed: 40,
+    onComplete: () => onTypingChange?.(false)
+  });
+  
+  if (isTyping && onTypingChange) {
+    onTypingChange(true);
+  }
   return (
     <AnimatePresence>
       {show && (
@@ -25,7 +35,7 @@ export default function DialogueBubble({ message, show, children }: DialogueBubb
             damping: 15,
             duration: 0.6
           }}
-          className="fixed top-4 sm:top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-md sm:max-w-xl lg:max-w-2xl px-3 sm:px-4"
+          className="fixed top-1/4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md sm:max-w-xl lg:max-w-2xl px-3 sm:px-4"
         >
           {/* Облачко диалога с breathing эффектом */}
           <motion.div 
@@ -61,7 +71,7 @@ export default function DialogueBubble({ message, show, children }: DialogueBubb
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
             >
-              {message}
+              {displayedText}
             </motion.p>
 
             {/* Опциональный контент (например, инпуты) */}

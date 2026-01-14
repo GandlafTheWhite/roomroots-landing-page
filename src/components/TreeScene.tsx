@@ -2,10 +2,11 @@ import { motion } from 'framer-motion';
 import TreeCharacter from './TreeCharacter';
 
 interface TreeSceneProps {
-  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
+  isTalking?: boolean;
 }
 
-export default function TreeScene({ emotion }: TreeSceneProps) {
+export default function TreeScene({ emotion, isTalking = false }: TreeSceneProps) {
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
@@ -33,7 +34,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
       </div>
 
       {/* МАСТЕРСКАЯ - ФОН */}
-      <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-50">
         <svg
           width="100%"
           height="100%"
@@ -68,6 +69,29 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
           <motion.g initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 0.3 }} transition={{ duration: 1.5, delay: 0.9 }}>
             <rect x="200" y="700" width="800" height="80" fill="#3d2817" rx="4" />
             <circle cx="500" cy="730" r="15" fill="#5c8a4d" opacity="0.7" />
+            <circle cx="550" cy="725" r="12" fill="#4a7c59" opacity="0.7" />
+            <circle cx="600" cy="730" r="18" fill="#6b8e23" opacity="0.6" />
+          </motion.g>
+          
+          {/* Инструменты на полу слева */}
+          <motion.g initial={{ opacity: 0, x: -30 }} animate={{ opacity: 0.4, x: 0 }} transition={{ duration: 1.8, delay: 1.1 }}>
+            <rect x="150" y="680" width="25" height="45" fill="#8b4513" rx="2" />
+            <ellipse cx="162" cy="673" rx="15" ry="8" fill="#a0522d" />
+            <circle cx="200" cy="705" r="20" fill="#556b2f" opacity="0.8" />
+          </motion.g>
+          
+          {/* Инструменты на полу справа */}
+          <motion.g initial={{ opacity: 0, x: 30 }} animate={{ opacity: 0.4, x: 0 }} transition={{ duration: 1.8, delay: 1.2 }}>
+            <ellipse cx="1050" cy="695" rx="22" ry="28" fill="#8b4513" />
+            <rect x="1020" y="705" width="18" height="35" fill="#a0522d" rx="2" />
+          </motion.g>
+          
+          {/* Висящие растения */}
+          <motion.g initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 0.5 }} transition={{ duration: 2, delay: 1.3 }}>
+            <motion.path d="M 80 280 Q 85 320 80 360" stroke="#4a7c59" strokeWidth="3" fill="none" animate={{ d: ['M 80 280 Q 85 320 80 360', 'M 80 280 Q 75 320 80 360', 'M 80 280 Q 85 320 80 360'] }} transition={{ duration: 4, repeat: Infinity }} />
+            <ellipse cx="80" cy="365" rx="12" ry="18" fill="#5c8a4d" />
+            <motion.path d="M 1100 280 Q 1095 320 1100 360" stroke="#4a7c59" strokeWidth="3" fill="none" animate={{ d: ['M 1100 280 Q 1095 320 1100 360', 'M 1100 280 Q 1105 320 1100 360', 'M 1100 280 Q 1095 320 1100 360'] }} transition={{ duration: 4.5, repeat: Infinity }} />
+            <ellipse cx="1100" cy="365" rx="12" ry="18" fill="#5c8a4d" />
           </motion.g>
         </svg>
       </div>
@@ -88,7 +112,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
 
       {/* ПЕРСОНАЖ - Антропоморфный дух леса */}
       <div className="relative z-10">
-        <TreeCharacter emotion={emotion} />
+        <TreeCharacter emotion={emotion} isTalking={isTalking} />
       </div>
 
       {/* Старое дерево (удалить весь блок ниже) */}

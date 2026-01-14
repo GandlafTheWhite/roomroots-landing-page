@@ -1,12 +1,20 @@
 import { motion } from 'framer-motion';
 
 interface CharacterHeadProps {
-  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
   eyes: { shape: string; glow: number; size: number };
   mouthPath: string;
+  isTalking?: boolean;
 }
 
-export default function CharacterHead({ emotion, eyes, mouthPath }: CharacterHeadProps) {
+export default function CharacterHead({ emotion, eyes, mouthPath, isTalking = false }: CharacterHeadProps) {
+  const getTalkingMouthPath = () => {
+    if (emotion === 'happy') return mouthPath;
+    const baseY = 325;
+    return `M180 ${baseY} Q200 ${baseY + 8} 220 ${baseY}`;
+  };
+  
+  const talkingMouth = getTalkingMouthPath();
   return (
     <>
       {/* ГОЛОВА (круглая, мшистая) */}
@@ -138,7 +146,7 @@ export default function CharacterHead({ emotion, eyes, mouthPath }: CharacterHea
           )}
         </motion.g>
 
-        {/* ШИРОКАЯ УЛЫБКА */}
+        {/* УЛЫБКА */}
         <motion.path
           d={mouthPath}
           stroke="#1a1a1a"
@@ -147,11 +155,17 @@ export default function CharacterHead({ emotion, eyes, mouthPath }: CharacterHea
           fill="none"
           opacity="0.85"
           animate={{
-            d: emotion === 'happy' 
-              ? ['M160 315 Q200 340 240 315', 'M160 315 Q200 345 240 315', 'M160 315 Q200 340 240 315']
-              : [mouthPath]
+            d: isTalking
+              ? [mouthPath, talkingMouth, mouthPath]
+              : emotion === 'happy' 
+                ? ['M160 325 Q200 350 240 325', 'M160 325 Q200 355 240 325', 'M160 325 Q200 350 240 325']
+                : [mouthPath]
           }}
-          transition={{ duration: 0.6 }}
+          transition={{ 
+            duration: isTalking ? 0.3 : 0.6,
+            repeat: isTalking ? Infinity : emotion === 'happy' ? Infinity : 0,
+            ease: 'easeInOut'
+          }}
         />
       </motion.g>
 
@@ -160,7 +174,7 @@ export default function CharacterHead({ emotion, eyes, mouthPath }: CharacterHea
         initial={{ opacity: 0, scale: 0.3 }}
         animate={{ 
           opacity: 1, 
-          scale: emotion === 'happy' ? [1, 1.15, 1] : [1, 1.05, 1],
+          scale: emotion === 'happy' ? [1, 1.15, 1] : emotion === 'excited' ? [1, 1.12, 1] : emotion === 'sad' ? [1, 1.02, 1] : [1, 1.05, 1],
         }}
         transition={{ 
           opacity: { duration: 2, delay: 1.2 },

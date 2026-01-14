@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 interface CharacterSporesProps {
-  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
 }
 
 export function SVGDefinitions() {
@@ -29,7 +29,7 @@ export function SVGDefinitions() {
 }
 
 export default function CharacterSpores({ emotion }: CharacterSporesProps) {
-  if (emotion === 'thinking') {
+  if (emotion === 'thinking' || emotion === 'sad') {
     return null;
   }
 

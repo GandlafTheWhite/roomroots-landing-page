@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 interface CharacterBodyProps {
-  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
 }
 
 export default function CharacterBody({ emotion }: CharacterBodyProps) {
@@ -93,9 +93,9 @@ export default function CharacterBody({ emotion }: CharacterBodyProps) {
         {/* Левая рука */}
         <motion.g
           animate={{ 
-            rotate: emotion === 'greeting' ? [0, -25, 0] : emotion === 'happy' ? [0, -15, 0] : [0, -8, 0],
+            rotate: emotion === 'greeting' ? [0, -25, 0] : emotion === 'happy' ? [0, -15, 0] : emotion === 'excited' ? [0, -18, 0] : emotion === 'surprised' ? [0, -12, 0] : emotion === 'sad' ? [0, -5, 0] : [0, -8, 0],
           }}
-          transition={{ duration: 2.5, repeat: Infinity }}
+          transition={{ duration: emotion === 'excited' ? 1.5 : 2.5, repeat: Infinity }}
           style={{ transformOrigin: '185px 440px' }}
         >
           <ellipse cx="185" cy="450" rx="22" ry="38" fill="#7ba428" opacity="0.95" transform="rotate(-35 185 450)" />
@@ -140,9 +140,9 @@ export default function CharacterBody({ emotion }: CharacterBodyProps) {
         {/* Правая рука */}
         <motion.g
           animate={{ 
-            rotate: emotion === 'greeting' ? [0, 25, 0] : emotion === 'happy' ? [0, 15, 0] : [0, 8, 0],
+            rotate: emotion === 'greeting' ? [0, 25, 0] : emotion === 'happy' ? [0, 15, 0] : emotion === 'excited' ? [0, 18, 0] : emotion === 'surprised' ? [0, 12, 0] : emotion === 'sad' ? [0, 5, 0] : [0, 8, 0],
           }}
-          transition={{ duration: 2.7, repeat: Infinity }}
+          transition={{ duration: emotion === 'excited' ? 1.5 : 2.7, repeat: Infinity }}
           style={{ transformOrigin: '315px 440px' }}
         >
           <ellipse cx="315" cy="450" rx="22" ry="38" fill="#7ba428" opacity="0.95" transform="rotate(35 315 450)" />

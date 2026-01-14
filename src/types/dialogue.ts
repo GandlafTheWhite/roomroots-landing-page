@@ -9,7 +9,7 @@ export interface UserPreferences {
 
 export interface DialogueMessage {
   text: string;
-  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+  emotion: 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
 }
 
 export interface Product {

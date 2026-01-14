@@ -17,6 +17,7 @@ export default function Home() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDialogue, setShowDialogue] = useState(false);
+  const [isTalking, setIsTalking] = useState(false);
 
   useEffect(() => {
     if (step === 'welcome') {
@@ -141,21 +142,21 @@ export default function Home() {
     <div className="w-full min-h-screen h-screen flex items-center justify-center overflow-hidden relative">
       {/* Фон с деревом */}
       <div className="absolute inset-0 w-full h-full">
-        <TreeScene emotion={emotion} />
+        <TreeScene emotion={emotion} isTalking={isTalking} />
       </div>
 
       {/* Диалоговое облачко */}
       <AnimatePresence mode="wait">
         {step === 'welcome' && showDialogue && (
-          <DialogueBubble message="Хэй-хэй! Я тут живу 🌿\n\nЗнаешь, я видел столько интересного в этих краях... Хочешь, покажу что-нибудь крутое?" show={true} />
+          <DialogueBubble message="Хэй-хэй! Я тут живу 🌿\n\nЗнаешь, я видел столько интересного в этих краях... Хочешь, покажу что-нибудь крутое?" show={true} onTypingChange={setIsTalking} />
         )}
-        {step === 'mood' && <DialogueBubble message={message} show={true} />}
-        {step === 'location' && <DialogueBubble message={message} show={true} />}
-        {step === 'size' && <DialogueBubble message={message} show={true} />}
-        {step === 'style' && <DialogueBubble message={message} show={true} />}
-        {step === 'reveal' && <DialogueBubble message={message} show={true} />}
+        {step === 'mood' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
+        {step === 'location' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
+        {step === 'size' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
+        {step === 'style' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
+        {step === 'reveal' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
         {step === 'contact' && (
-          <DialogueBubble message={message} show={true}>
+          <DialogueBubble message={message} show={true} onTypingChange={setIsTalking}>
             <ContactForm
               preferences={preferences}
               productName={product?.name}

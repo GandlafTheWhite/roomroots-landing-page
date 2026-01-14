@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-type TreeEmotion = 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting';
+type TreeEmotion = 'idle' | 'greeting' | 'thinking' | 'happy' | 'presenting' | 'surprised' | 'sad' | 'excited';
 
 interface UseTreeEmotionReturn {
   emotion: TreeEmotion;
