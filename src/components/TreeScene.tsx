@@ -39,6 +39,20 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
     }
   };
 
+  // Глаза в зависимости от эмоции
+  const getEyes = () => {
+    switch (emotion) {
+      case 'happy':
+        return { leftY: 265, rightY: 265, shape: 'arc' }; // Закрытые улыбающиеся
+      case 'thinking':
+        return { leftY: 263, rightY: 268, shape: 'normal' }; // Один глаз приподнят
+      default:
+        return { leftY: 265, rightY: 265, shape: 'normal' }; // Спокойные
+    }
+  };
+
+  const eyes = getEyes();
+
   return (
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 relative overflow-hidden">
       {/* Фоновые частицы */}
@@ -127,6 +141,113 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
           <motion.circle cx="170" cy="290" r="18" fill="#5c8a4d" opacity="0.7"
             animate={{ scale: [1, 1.15, 1] }}
             transition={{ duration: 2.3, repeat: Infinity, delay: 0.5 }}
+          />
+
+          {/* ЛИЦО - Глаза */}
+          {eyes.shape === 'normal' ? (
+            <>
+              {/* Левый глаз */}
+              <motion.ellipse
+                cx="135"
+                cy={eyes.leftY}
+                rx="6"
+                ry="8"
+                fill="#2d1810"
+                initial={{ scale: 0 }}
+                animate={{ 
+                  scale: [0, 1, 1, 1, 0, 1],
+                  scaleY: [1, 1, 1, 0.1, 1, 1]
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity,
+                  times: [0, 0.1, 0.4, 0.5, 0.6, 1],
+                  delay: 1.5
+                }}
+              />
+              {/* Правый глаз */}
+              <motion.ellipse
+                cx="165"
+                cy={eyes.rightY}
+                rx="6"
+                ry="8"
+                fill="#2d1810"
+                initial={{ scale: 0 }}
+                animate={{ 
+                  scale: [0, 1, 1, 1, 0, 1],
+                  scaleY: [1, 1, 1, 0.1, 1, 1]
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity,
+                  times: [0, 0.1, 0.4, 0.5, 0.6, 1],
+                  delay: 1.5
+                }}
+              />
+              {/* Блики в глазах */}
+              <circle cx="137" cy="263" r="2" fill="#9dff9d" opacity="0.6" />
+              <circle cx="167" cy="263" r="2" fill="#9dff9d" opacity="0.6" />
+            </>
+          ) : (
+            <>
+              {/* Закрытые глаза (дуги) */}
+              <motion.path
+                d="M129 265 Q135 268 141 265"
+                stroke="#2d1810"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              <motion.path
+                d="M159 265 Q165 268 171 265"
+                stroke="#2d1810"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            </>
+          )}
+
+          {/* ЛИЦО - Умиротворенная улыбка */}
+          <motion.path
+            d="M135 285 Q150 290 165 285"
+            stroke="#2d1810"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.8 }}
+            transition={{ duration: 0.5, delay: 1.6 }}
+          />
+
+          {/* Щёчки (румянец) */}
+          <motion.ellipse
+            cx="120"
+            cy="278"
+            rx="8"
+            ry="6"
+            fill="#ff9999"
+            opacity="0.3"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.4, delay: 1.7 }}
+          />
+          <motion.ellipse
+            cx="180"
+            cy="278"
+            rx="8"
+            ry="6"
+            fill="#ff9999"
+            opacity="0.3"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.4, delay: 1.7 }}
           />
 
           {/* Ветки */}
@@ -246,15 +367,15 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
 
           {/* Светящиеся точки (споры мха) */}
           {[
-            { cx: 145, cy: 280, delay: 1.6 },
-            { cx: 155, cy: 275, delay: 1.7 },
-            { cx: 148, cy: 290, delay: 1.8 },
+            { cx: 145, cy: 295, delay: 1.9 },
+            { cx: 155, cy: 292, delay: 2.0 },
+            { cx: 148, cy: 305, delay: 2.1 },
           ].map((spore, i) => (
             <motion.circle
               key={`spore-${i}`}
               cx={spore.cx}
               cy={spore.cy}
-              r="3"
+              r="2"
               fill="#9dff9d"
               initial={{ opacity: 0 }}
               animate={{ 
@@ -270,9 +391,6 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
           ))}
         </svg>
       </motion.div>
-
-      {/* Текст эмоции (скрытый, для дебага) */}
-      {/* <div className="absolute bottom-4 text-white/20 text-xs">{emotion}</div> */}
     </div>
   );
 }

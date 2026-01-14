@@ -128,3 +128,58 @@
       );
   }
 }
+
+/* Адаптивность для всех устройств */
+@layer utilities {
+  /* Поддержка складных экранов (dual-screen) */
+  @media (horizontal-viewport-segments: 2) {
+    .dual-screen-layout {
+      display: grid;
+      grid-template-columns: env(viewport-segment-width 0 0) env(
+          viewport-segment-width 1 0
+        );
+      grid-gap: env(viewport-segment-left 1 0);
+    }
+  }
+
+  /* Оптимизация для очень широких экранов (раскладушки) */
+  @media (min-width: 1920px) {
+    .max-w-screen-ultra {
+      max-width: 2560px;
+    }
+  }
+
+  /* Оптимизация для маленьких складных экранов (внешний экран) */
+  @media (max-width: 480px) and (max-height: 900px) {
+    .compact-mode {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Ориентация: альбомная на телефонах */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .landscape-compact {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+  }
+
+  /* Safe area для iPhone notch и складных устройств */
+  @supports (padding: max(0px)) {
+    body {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+      padding-top: max(0px, env(safe-area-inset-top));
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Touch optimization */
+  @media (hover: none) and (pointer: coarse) {
+    button,
+    a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}

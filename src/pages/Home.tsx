@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TreeScene from '@/components/TreeScene';
 import ProductCard from '@/components/ProductCard';
 import ContactForm from '@/components/ContactForm';
+import DialogueBubble from '@/components/DialogueBubble';
+import ChoiceButtons from '@/components/ChoiceButtons';
 import { useTreeEmotion } from '@/hooks/useTreeEmotion';
 import { Button } from '@/components/ui/button';
 import type { DialogueStep, UserPreferences, Product } from '@/types/dialogue';
@@ -14,6 +16,13 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showDialogue, setShowDialogue] = useState(false);
+
+  useEffect(() => {
+    if (step === 'welcome') {
+      setTimeout(() => setShowDialogue(true), 500);
+    }
+  }, [step]);
 
   const handleStart = () => {
     greet();
@@ -120,267 +129,127 @@ export default function Home() {
     celebrate();
     setTimeout(() => {
       setMessage('Спасибо! Скоро свяжемся 🌿');
+      setShowDialogue(true);
     }, 500);
     setTimeout(() => {
       reset();
+      setShowDialogue(false);
     }, 3000);
   };
 
-  const renderWelcome = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <h1 className="text-4xl font-bold text-white mb-4">
-        Хэй-хэй! Я тут живу 🌿
-      </h1>
-      <p className="text-xl text-white/80 mb-8">
-        Знаешь, я видел столько интересного в этих краях... Хочешь, покажу что-нибудь крутое?
-      </p>
-      <div className="flex flex-col gap-3">
-        <Button
-          size="lg"
-          onClick={handleStart}
-          className="text-lg"
-        >
-          Давай покажешь!
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="text-lg"
-        >
-          Покажи сразу
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="text-white/60"
-        >
-          О студии
-        </Button>
-      </div>
-    </motion.div>
-  );
-
-  const renderMood = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      <div className="grid grid-cols-3 gap-4">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleMoodSelect('calm')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">🍃</span>
-          <span>Спокойное</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleMoodSelect('vibrant')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">✨</span>
-          <span>Яркое</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleMoodSelect('minimal')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">⚪</span>
-          <span>Минимализм</span>
-        </Button>
-      </div>
-    </motion.div>
-  );
-
-  const renderLocation = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      <div className="grid grid-cols-2 gap-4">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleLocationSelect('home')}
-          className="h-24 text-white border-white/20 hover:border-white/40"
-        >
-          🏠 Дом
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleLocationSelect('office')}
-          className="h-24 text-white border-white/20 hover:border-white/40"
-        >
-          💼 Офис
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleLocationSelect('gift')}
-          className="h-24 text-white border-white/20 hover:border-white/40"
-        >
-          🎁 Подарок
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleLocationSelect('cafe')}
-          className="h-24 text-white border-white/20 hover:border-white/40"
-        >
-          ☕ Кафе
-        </Button>
-      </div>
-    </motion.div>
-  );
-
-  const renderSize = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      <div className="grid grid-cols-3 gap-4">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleSizeSelect('small')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-3xl">S</span>
-          <span className="text-sm">Компактное</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleSizeSelect('medium')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">M</span>
-          <span className="text-sm">Среднее</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleSizeSelect('large')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-5xl">L</span>
-          <span className="text-sm">Вау-объект</span>
-        </Button>
-      </div>
-    </motion.div>
-  );
-
-  const renderStyle = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      <div className="grid grid-cols-3 gap-4">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleStyleSelect('warm')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">🌳</span>
-          <span>Тёплое дерево</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleStyleSelect('industrial')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">🏭</span>
-          <span>Бетон-лофт</span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleStyleSelect('minimal')}
-          className="h-32 flex flex-col gap-2 text-white border-white/20 hover:border-white/40"
-        >
-          <span className="text-4xl">⬜</span>
-          <span>Белый минимализм</span>
-        </Button>
-      </div>
-    </motion.div>
-  );
-
-  const renderReveal = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      {loading || !product ? (
-        <div className="text-white/60 text-center py-12">
-          <div className="animate-pulse">Загружаю твоё уникальное изделие...</div>
-        </div>
-      ) : (
-        <ProductCard
-          product={product}
-          onTake={handleTakeProduct}
-          onAnother={handleAnotherDrop}
-          onCustom={handleCustomOrder}
-        />
-      )}
-    </motion.div>
-  );
-
-  const renderContact = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <p className="text-2xl text-white mb-6">{message}</p>
-      <ContactForm
-        preferences={preferences}
-        productName={product?.name}
-        onSuccess={handleContactSuccess}
-      />
-    </motion.div>
-  );
-
   return (
-    <div className="w-full h-screen flex">
-      <div className="w-3/5 h-full bg-gradient-to-br from-slate-950 to-slate-900">
+    <div className="w-full min-h-screen h-screen flex items-center justify-center overflow-hidden relative">
+      {/* Фон с деревом */}
+      <div className="absolute inset-0 w-full h-full">
         <TreeScene emotion={emotion} />
       </div>
 
-      <div className="w-2/5 h-full flex items-center justify-center p-12 bg-gradient-to-br from-slate-900 to-slate-800 overflow-y-auto">
-        <div className="w-full max-w-lg">
-          <AnimatePresence mode="wait">
-            {step === 'welcome' && renderWelcome()}
-            {step === 'mood' && renderMood()}
-            {step === 'location' && renderLocation()}
-            {step === 'size' && renderSize()}
-            {step === 'style' && renderStyle()}
-            {step === 'reveal' && renderReveal()}
-            {step === 'contact' && renderContact()}
-          </AnimatePresence>
-        </div>
-      </div>
+      {/* Диалоговое облачко */}
+      <AnimatePresence mode="wait">
+        {step === 'welcome' && showDialogue && (
+          <DialogueBubble message="Хэй-хэй! Я тут живу 🌿\n\nЗнаешь, я видел столько интересного в этих краях... Хочешь, покажу что-нибудь крутое?" show={true} />
+        )}
+        {step === 'mood' && <DialogueBubble message={message} show={true} />}
+        {step === 'location' && <DialogueBubble message={message} show={true} />}
+        {step === 'size' && <DialogueBubble message={message} show={true} />}
+        {step === 'style' && <DialogueBubble message={message} show={true} />}
+        {step === 'reveal' && <DialogueBubble message={message} show={true} />}
+        {step === 'contact' && (
+          <DialogueBubble message={message} show={true}>
+            <ContactForm
+              preferences={preferences}
+              productName={product?.name}
+              onSuccess={handleContactSuccess}
+            />
+          </DialogueBubble>
+        )}
+      </AnimatePresence>
+
+      {/* Кнопки выбора внизу */}
+      <AnimatePresence mode="wait">
+        {step === 'welcome' && showDialogue && (
+          <ChoiceButtons
+            layout="column"
+            choices={[
+              { label: 'Давай покажешь!', emoji: '🌿', onClick: handleStart },
+              { label: 'Покажи сразу', variant: 'outline', onClick: () => console.log('Show all') },
+              { label: 'О студии', variant: 'ghost', onClick: () => console.log('About') }
+            ]}
+          />
+        )}
+
+        {step === 'mood' && (
+          <ChoiceButtons
+            choices={[
+              { label: 'Спокойное', emoji: '🍃', onClick: () => handleMoodSelect('calm') },
+              { label: 'Яркое', emoji: '✨', onClick: () => handleMoodSelect('vibrant') },
+              { label: 'Минимализм', emoji: '⚪', onClick: () => handleMoodSelect('minimal') }
+            ]}
+          />
+        )}
+
+        {step === 'location' && (
+          <ChoiceButtons
+            choices={[
+              { label: 'Дом', emoji: '🏠', onClick: () => handleLocationSelect('home') },
+              { label: 'Офис', emoji: '💼', onClick: () => handleLocationSelect('office') },
+              { label: 'Подарок', emoji: '🎁', onClick: () => handleLocationSelect('gift') },
+              { label: 'Кафе', emoji: '☕', onClick: () => handleLocationSelect('cafe') }
+            ]}
+          />
+        )}
+
+        {step === 'size' && (
+          <ChoiceButtons
+            choices={[
+              { label: 'Компактное', emoji: 'S', onClick: () => handleSizeSelect('small') },
+              { label: 'Среднее', emoji: 'M', onClick: () => handleSizeSelect('medium') },
+              { label: 'Вау-объект', emoji: 'L', onClick: () => handleSizeSelect('large') }
+            ]}
+          />
+        )}
+
+        {step === 'style' && (
+          <ChoiceButtons
+            choices={[
+              { label: 'Тёплое дерево', emoji: '🌳', onClick: () => handleStyleSelect('warm') },
+              { label: 'Бетон-лофт', emoji: '🏭', onClick: () => handleStyleSelect('industrial') },
+              { label: 'Белый минимализм', emoji: '⬜', onClick: () => handleStyleSelect('minimal') }
+            ]}
+          />
+        )}
+
+        {step === 'reveal' && !loading && product && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 sm:px-6 z-40"
+          >
+            <ProductCard
+              product={product}
+              onTake={handleTakeProduct}
+              onAnother={handleAnotherDrop}
+              onCustom={handleCustomOrder}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Индикатор загрузки */}
+      {loading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed bottom-12 left-1/2 -translate-x-1/2 text-white/80 text-lg sm:text-xl font-medium z-30"
+        >
+          <div className="bg-slate-900/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+              <span>Ищу что-то особенное...</span>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

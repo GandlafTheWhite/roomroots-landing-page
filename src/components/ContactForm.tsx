@@ -60,53 +60,53 @@ export default function ContactForm({ preferences, productName, onSuccess }: Con
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="space-y-4"
+      className="space-y-3 sm:space-y-4"
     >
-      <div className="space-y-2">
-        <label className="text-white/80 text-sm">Как вас зовут?</label>
+      <div className="space-y-1 sm:space-y-2">
+        <label className="text-slate-700 text-sm sm:text-base font-medium">Как вас зовут?</label>
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Иван"
-          className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+          className="bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 h-11 sm:h-12 text-base"
         />
       </div>
 
-      <div className="space-y-2">
-        <label className="text-white/80 text-sm">Телефон или Telegram *</label>
+      <div className="space-y-1 sm:space-y-2">
+        <label className="text-slate-700 text-sm sm:text-base font-medium">Телефон или Telegram *</label>
         <Input
           value={contact}
           onChange={(e) => setContact(e.target.value)}
           placeholder="+7 900 123-45-67 или @username"
           required
-          className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+          className="bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 h-11 sm:h-12 text-base"
         />
       </div>
 
-      <div className="space-y-2">
-        <label className="text-white/80 text-sm">Комментарий</label>
+      <div className="space-y-1 sm:space-y-2">
+        <label className="text-slate-700 text-sm sm:text-base font-medium">Комментарий</label>
         <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Любые пожелания..."
-          className="bg-white/5 border-white/20 text-white placeholder:text-white/40 min-h-[80px]"
+          className="bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 min-h-[80px] text-base"
         />
       </div>
 
       {error && (
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-red-600 text-sm font-medium">{error}</p>
       )}
 
       <Button
         type="submit"
         size="lg"
         disabled={loading}
-        className="w-full"
+        className="w-full h-12 sm:h-14 text-base sm:text-lg"
       >
         {loading ? 'Отправляю...' : 'Отправить заявку 🚀'}
       </Button>
 
-      <p className="text-white/40 text-xs text-center">
+      <p className="text-slate-500 text-xs sm:text-sm text-center">
         Мы свяжемся с вами в течение дня
       </p>
     </motion.form>
