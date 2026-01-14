@@ -22,65 +22,147 @@ export default function DialogueBubble({ message, show, children, onTypingChange
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.7 }}
+          initial={{ opacity: 0, y: 50, rotateX: -15, scale: 0.8 }}
           animate={{ 
             opacity: 1, 
-            y: [30, -5, 0],
-            scale: [0.7, 1.05, 1]
+            y: 0,
+            rotateX: 0,
+            scale: 1
           }}
-          exit={{ opacity: 0, y: -20, scale: 0.8 }}
+          exit={{ 
+            opacity: 0, 
+            y: -30, 
+            rotateX: 15,
+            scale: 0.9,
+            transition: { duration: 0.3 }
+          }}
           transition={{ 
             type: 'spring', 
-            stiffness: 200,
-            damping: 15,
-            duration: 0.6
+            stiffness: 280,
+            damping: 20,
+            duration: 0.7
           }}
-          className="fixed top-[15%] sm:top-1/4 left-1/2 -translate-x-1/2 z-50 w-full max-w-[90%] sm:max-w-md md:max-w-xl lg:max-w-2xl px-3 sm:px-4"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[85vw] max-w-md sm:max-w-lg md:max-w-xl"
+          style={{ perspective: '1000px' }}
         >
-          {/* Облачко диалога с breathing эффектом */}
-          <motion.div 
-            className="relative bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-2xl p-3 sm:p-4 md:p-6 max-h-[45vh] sm:max-h-[40vh] overflow-y-auto"
-            animate={{ 
-              y: [0, -3, 0],
-              scale: [1, 1.005, 1]
+          {/* Декоративное свечение */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 via-cyan-400/20 to-emerald-400/20 rounded-[2rem] blur-2xl"
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+              scale: [0.95, 1.05, 0.95]
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
               ease: 'easeInOut'
             }}
+          />
+
+          {/* Облачко диалога */}
+          <motion.div 
+            className="relative bg-gradient-to-br from-white via-white to-emerald-50/30 backdrop-blur-md rounded-[1.75rem] shadow-[0_20px_60px_rgba(0,0,0,0.3)] border-2 border-white/60 p-4 sm:p-5 md:p-6 overflow-hidden"
+            animate={{ 
+              y: [0, -6, 0],
+              rotateZ: [0, 0.5, -0.5, 0]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut'
+            }}
           >
-            {/* Хвостик облачка с отдельной анимацией */}
-            <motion.div 
-              className="absolute -bottom-3 sm:-bottom-4 left-1/2 -translate-x-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-white/95 backdrop-blur-sm rotate-45 rounded-sm"
-              initial={{ scale: 0, y: -10 }}
-              animate={{ 
-                scale: 1, 
-                y: [0, 2, 0]
+            {/* Блики света */}
+            <motion.div
+              className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 via-transparent to-transparent rounded-[1.75rem] pointer-events-none"
+              animate={{
+                opacity: [0.3, 0.6, 0.3]
               }}
               transition={{
-                scale: { delay: 0.3, duration: 0.3 },
-                y: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }
+                duration: 2.5,
+                repeat: Infinity
+              }}
+            />
+
+            {/* Декоративные частицы */}
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1.5 h-1.5 bg-emerald-400/40 rounded-full"
+                style={{
+                  left: `${15 + i * 15}%`,
+                  top: `${10 + (i % 2) * 80}%`
+                }}
+                animate={{
+                  y: [0, -10, 0],
+                  opacity: [0.3, 0.8, 0.3],
+                  scale: [0.8, 1.2, 0.8]
+                }}
+                transition={{
+                  duration: 2 + i * 0.3,
+                  repeat: Infinity,
+                  delay: i * 0.2
+                }}
+              />
+            ))}
+
+            {/* Хвостик облачка */}
+            <motion.div 
+              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-br from-white to-emerald-50/30 backdrop-blur-md rotate-45 border-r-2 border-b-2 border-white/60"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ 
+                scale: 1,
+                rotate: 45,
+                y: [0, 3, 0]
+              }}
+              transition={{
+                scale: { delay: 0.4, duration: 0.4, type: 'spring' },
+                rotate: { delay: 0.4, duration: 0.4 },
+                y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }
               }}
             />
             
             {/* Текст сообщения */}
-            <motion.p 
-              className="text-slate-800 text-sm sm:text-base lg:text-lg font-medium text-center leading-relaxed relative z-10 whitespace-pre-line"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="relative z-10"
             >
-              {displayedText}
-            </motion.p>
+              <motion.p 
+                className="text-slate-800 text-[15px] sm:text-base md:text-lg font-medium text-center leading-relaxed whitespace-pre-line"
+                animate={{
+                  textShadow: [
+                    '0 0 0px rgba(0,0,0,0)',
+                    '0 1px 3px rgba(0,0,0,0.1)',
+                    '0 0 0px rgba(0,0,0,0)'
+                  ]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity
+                }}
+              >
+                {displayedText}
+              </motion.p>
 
-            {/* Опциональный контент (например, инпуты) */}
+              {/* Курсор при печати */}
+              {isTyping && (
+                <motion.span
+                  className="inline-block w-1 h-5 bg-emerald-600 ml-0.5 align-middle"
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                />
+              )}
+            </motion.div>
+
+            {/* Опциональный контент */}
             {children && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-4 sm:mt-6 relative z-10"
+                transition={{ delay: 0.6, type: 'spring' }}
+                className="mt-5 relative z-10"
               >
                 {children}
               </motion.div>
