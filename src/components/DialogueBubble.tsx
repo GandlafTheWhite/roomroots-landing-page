@@ -42,7 +42,7 @@ export default function DialogueBubble({ message, show, children, onTypingChange
             damping: 20,
             duration: 0.7
           }}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100vw-2rem)] max-w-[340px] sm:max-w-md md:max-w-lg px-2"
+          className="fixed top-[8%] sm:top-[12%] md:top-[15%] left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-2rem)] max-w-[340px] sm:max-w-md md:max-w-lg px-2"
           style={{ perspective: '1000px' }}
         >
           {/* Декоративное свечение */}
