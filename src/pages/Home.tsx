@@ -5,8 +5,8 @@ import ProductCard from '@/components/ProductCard';
 import ContactForm from '@/components/ContactForm';
 import DialogueBubble from '@/components/DialogueBubble';
 import ChoiceButtons from '@/components/ChoiceButtons';
+import LoadingIndicator from '@/components/LoadingIndicator';
 import { useTreeEmotion } from '@/hooks/useTreeEmotion';
-import { Button } from '@/components/ui/button';
 import type { DialogueStep, UserPreferences, Product } from '@/types/dialogue';
 
 export default function Home() {
@@ -236,20 +236,9 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Индикатор загрузки */}
-      {loading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed bottom-12 left-1/2 -translate-x-1/2 text-white/80 text-lg sm:text-xl font-medium z-30"
-        >
-          <div className="bg-slate-900/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl">
-            <div className="flex items-center gap-3">
-              <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-              <span>Ищу что-то особенное...</span>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {loading && <LoadingIndicator />}
+      </AnimatePresence>
     </div>
   );
 }

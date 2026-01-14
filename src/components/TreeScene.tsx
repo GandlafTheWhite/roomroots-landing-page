@@ -45,7 +45,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
       case 'happy':
         return { leftY: 265, rightY: 265, shape: 'arc' }; // Закрытые улыбающиеся
       case 'thinking':
-        return { leftY: 263, rightY: 268, shape: 'normal' }; // Один глаз приподнят
+        return { leftY: 265, rightY: 265, shape: 'closed' }; // Закрытые глаза
       default:
         return { leftY: 265, rightY: 265, shape: 'normal' }; // Спокойные
     }
@@ -78,9 +78,49 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
         ))}
       </div>
 
+      {/* МАСТЕРСКАЯ - ФОН */}
+      <div className="absolute inset-0 opacity-30">
+        <svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 1200 800"
+          preserveAspectRatio="xMidYMid slice"
+          className="w-full h-full"
+        >
+          {/* Окно сзади */}
+          <motion.rect
+            x="400" y="50" width="400" height="300"
+            fill="#4a7c59" opacity="0.2" rx="20"
+            initial={{ opacity: 0 }} animate={{ opacity: 0.2 }}
+            transition={{ duration: 2 }}
+          />
+          {/* Полки слева */}
+          <motion.g initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 0.4 }} transition={{ duration: 1.5, delay: 0.5 }}>
+            <rect x="50" y="250" width="180" height="8" fill="#3d2817" rx="2" />
+            <ellipse cx="100" cy="240" rx="15" ry="25" fill="#4a7c59" />
+            <ellipse cx="140" cy="235" rx="20" ry="30" fill="#5c8a4d" />
+            <rect x="50" y="380" width="180" height="8" fill="#3d2817" rx="2" />
+            <ellipse cx="90" cy="365" rx="18" ry="28" fill="#5c8a4d" />
+          </motion.g>
+          {/* Полки справа */}
+          <motion.g initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 0.4 }} transition={{ duration: 1.5, delay: 0.7 }}>
+            <rect x="970" y="250" width="180" height="8" fill="#3d2817" rx="2" />
+            <ellipse cx="1000" cy="240" rx="15" ry="25" fill="#4a7c59" />
+            <ellipse cx="1050" cy="235" rx="20" ry="30" fill="#5c8a4d" />
+            <rect x="970" y="380" width="180" height="8" fill="#3d2817" rx="2" />
+            <ellipse cx="1010" cy="365" rx="18" ry="28" fill="#5c8a4d" />
+          </motion.g>
+          {/* Рабочий стол */}
+          <motion.g initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 0.3 }} transition={{ duration: 1.5, delay: 0.9 }}>
+            <rect x="200" y="700" width="800" height="80" fill="#3d2817" rx="4" />
+            <circle cx="500" cy="730" r="15" fill="#5c8a4d" opacity="0.7" />
+          </motion.g>
+        </svg>
+      </div>
+
       {/* Свечение под деревом */}
       <motion.div
-        className="absolute bottom-1/3 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
+        className="absolute bottom-1/4 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3],
@@ -98,8 +138,8 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
         {...getAnimationProps()}
       >
         <svg
-          width="300"
-          height="400"
+          width="500"
+          height="700"
           viewBox="0 0 300 400"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -144,7 +184,27 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
           />
 
           {/* ЛИЦО - Глаза */}
-          {eyes.shape === 'normal' ? (
+          {eyes.shape === 'closed' ? (
+            <>
+              {/* Закрытые глаза (thinking) */}
+              <motion.path
+                d="M129 265 Q135 268 141 265"
+                stroke="#2d1810"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+                animate={{ pathLength: [1, 1] }}
+              />
+              <motion.path
+                d="M159 265 Q165 268 171 265"
+                stroke="#2d1810"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+                animate={{ pathLength: [1, 1] }}
+              />
+            </>
+          ) : eyes.shape === 'normal' ? (
             <>
               {/* Левый глаз */}
               <motion.ellipse
@@ -226,29 +286,7 @@ export default function TreeScene({ emotion }: TreeSceneProps) {
             transition={{ duration: 0.5, delay: 1.6 }}
           />
 
-          {/* Щёчки (румянец) */}
-          <motion.ellipse
-            cx="120"
-            cy="278"
-            rx="8"
-            ry="6"
-            fill="#ff9999"
-            opacity="0.3"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.4, delay: 1.7 }}
-          />
-          <motion.ellipse
-            cx="180"
-            cy="278"
-            rx="8"
-            ry="6"
-            fill="#ff9999"
-            opacity="0.3"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.4, delay: 1.7 }}
-          />
+
 
           {/* Ветки */}
           <motion.path
