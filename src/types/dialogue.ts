@@ -1,4 +1,4 @@
-export type DialogueStep = 'welcome' | 'mood' | 'location' | 'size' | 'style' | 'reveal' | 'contact';
+export type DialogueStep = 'welcome' | 'aboutMe' | 'mood' | 'location' | 'size' | 'style' | 'reveal' | 'contact';
 
 export interface UserPreferences {
   mood?: 'calm' | 'vibrant' | 'minimal';

@@ -46,6 +46,9 @@ export default function Home() {
   const [isDigressing, setIsDigressing] = useState(false);
   const [digressionButtons, setDigressionButtons] = useState<Digression['buttons']>([]);
   const [nextStepAfterDigression, setNextStepAfterDigression] = useState<DialogueStep | null>(null);
+  const [hasIntroduced, setHasIntroduced] = useState(() => {
+    return localStorage.getItem('tree_introduced') === 'true';
+  });
 
   // Таймаут на бездействие (объявляем заранее)
   const handleTimeout = useCallback(() => {
@@ -141,6 +144,21 @@ export default function Home() {
       resetTimeout();
     }, 1000);
   };
+
+  const handleAboutMe = useCallback(() => {
+    resetTimeout();
+    const aboutStep = hasIntroduced ? 'aboutMeRepeated' : 'aboutMe';
+    const aboutMessage = getVariant(aboutStep, personality);
+    
+    setStep('aboutMe');
+    setMessage(aboutMessage);
+    think();
+    
+    if (!hasIntroduced) {
+      setHasIntroduced(true);
+      localStorage.setItem('tree_introduced', 'true');
+    }
+  }, [hasIntroduced, getVariant, personality, think, resetTimeout]);
 
   const handleMoodSelect = useCallback((mood: 'calm' | 'vibrant' | 'minimal') => {
     resetTimeout();
@@ -302,6 +320,18 @@ export default function Home() {
     think();
   }, [resetRetry, getVariant, personality, think, clearTimer]);
 
+  const handleCloseProduct = useCallback(() => {
+    setProduct(null);
+    const closePhrases = [
+      'Эх, не понравилось? Ну ладно... Хочешь попробовать заново? 😔',
+      'О нет, мы не в синергии! Может, начнём сначала? 🤔',
+      'Обманывается тот, кто обманываться рад... Но я не обижаюсь. Начнём заново? 🌿'
+    ];
+    const closeMessage = closePhrases[Math.floor(Math.random() * closePhrases.length)];
+    setMessage(closeMessage);
+    reset();
+  }, [reset, setMessage]);
+
   const handleContactSuccess = useCallback(() => {
     const isGrumpy = personality === 'grumpy' || retryCount > 2;
     const thankYouStep = isGrumpy ? 'thankYouGrumpy' : 'thankYou';
@@ -358,9 +388,19 @@ export default function Home() {
           <ChoiceButtons
             layout="column"
             choices={[
-              { label: 'Давай покажешь!', emoji: '🌿', onClick: handleStart },
-              { label: 'Покажи сразу', variant: 'outline', onClick: () => console.log('Show all') },
+              { label: 'Давай!', emoji: '🌿', onClick: handleStart },
+              { label: 'Ты кто?', emoji: '🤔', variant: 'outline', onClick: handleAboutMe },
               { label: 'О студии', variant: 'ghost', onClick: () => console.log('About') }
+            ]}
+          />
+        )}
+
+        {step === 'aboutMe' && showDialogue && (
+          <ChoiceButtons
+            layout="column"
+            choices={[
+              { label: 'Давай выбирать!', emoji: '🌿', onClick: handleStart },
+              { label: 'Расскажи ещё', emoji: '👂', variant: 'outline', onClick: handleAboutMe }
             ]}
           />
         )}
@@ -429,7 +469,7 @@ export default function Home() {
               onTake={handleTakeProduct}
               onAnother={isBlocked ? undefined : handleAnotherDrop}
               onCustom={handleCustomOrder}
-              onClose={() => setProduct(null)}
+              onClose={handleCloseProduct}
             />
           </motion.div>
         )}
