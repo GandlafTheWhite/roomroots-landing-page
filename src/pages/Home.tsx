@@ -47,6 +47,28 @@ export default function Home() {
   const [digressionButtons, setDigressionButtons] = useState<Digression['buttons']>([]);
   const [nextStepAfterDigression, setNextStepAfterDigression] = useState<DialogueStep | null>(null);
 
+  // Таймаут на бездействие (объявляем заранее)
+  const handleTimeout = useCallback(() => {
+    if (!showTimeoutMessage && !loading && step !== 'welcome' && step !== 'contact' && step !== 'reveal' && !isDigressing) {
+      const timeoutPhrase = getTimeoutPhrase(step);
+      setShowTimeoutMessage(true);
+      
+      const originalMessage = message;
+      setMessage(timeoutPhrase);
+      
+      setTimeout(() => {
+        setMessage(originalMessage);
+        setShowTimeoutMessage(false);
+      }, 3000);
+    }
+  }, [showTimeoutMessage, loading, step, getTimeoutPhrase, message, isDigressing]);
+
+  const { resetTimeout, clearTimer } = useTimeout({
+    timeout: 15000,
+    onTimeout: handleTimeout,
+    enabled: !loading && !isTalking && step !== 'welcome' && step !== 'contact' && !isDigressing
+  });
+
   // Функция показа отвлечения
   const showDigression = useCallback((nextStep: DialogueStep) => {
     const digression = getRandomDigression(personality);
@@ -95,28 +117,6 @@ export default function Home() {
     reset();
     resetTimeout();
   }, [getVariant, personality, reset, resetTimeout]);
-
-  // Таймаут на бездействие (15 секунд)
-  const handleTimeout = useCallback(() => {
-    if (!showTimeoutMessage && !loading && step !== 'welcome' && step !== 'contact' && step !== 'reveal' && !isDigressing) {
-      const timeoutPhrase = getTimeoutPhrase(step);
-      setShowTimeoutMessage(true);
-      
-      const originalMessage = message;
-      setMessage(timeoutPhrase);
-      
-      setTimeout(() => {
-        setMessage(originalMessage);
-        setShowTimeoutMessage(false);
-      }, 3000);
-    }
-  }, [showTimeoutMessage, loading, step, getTimeoutPhrase, message, isDigressing]);
-
-  const { resetTimeout, clearTimer } = useTimeout({
-    timeout: 15000,
-    onTimeout: handleTimeout,
-    enabled: !loading && !isTalking && step !== 'welcome' && step !== 'contact' && !isDigressing
-  });
 
   // Инициализация приветствия
   useEffect(() => {
