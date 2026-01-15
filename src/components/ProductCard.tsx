@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import Icon from '@/components/ui/icon';
 import type { Product } from '@/types/dialogue';
 
 interface ProductCardProps {
@@ -7,16 +8,27 @@ interface ProductCardProps {
   onTake: () => void;
   onAnother: () => void;
   onCustom: () => void;
+  onClose?: () => void;
 }
 
-export default function ProductCard({ product, onTake, onAnother, onCustom }: ProductCardProps) {
+export default function ProductCard({ product, onTake, onAnother, onCustom, onClose }: ProductCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9, rotateY: 90 }}
       animate={{ opacity: 1, scale: 1, rotateY: 0 }}
       transition={{ duration: 0.8, type: 'spring' }}
-      className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[65vh] sm:max-h-[70vh] overflow-y-auto"
+      className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[65vh] sm:max-h-[70vh] overflow-y-auto relative"
     >
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/80 hover:bg-white rounded-full shadow-md transition-all hover:scale-110"
+          aria-label="Закрыть"
+        >
+          <Icon name="X" size={18} className="text-slate-600" />
+        </button>
+      )}
+      
       <div className="aspect-square overflow-hidden">
         <img
           src={product.imageUrl}

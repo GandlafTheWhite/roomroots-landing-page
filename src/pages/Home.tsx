@@ -422,13 +422,14 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-6 left-[calc(50%-200px)] sm:left-1/2 -translate-x-1/2 w-full max-w-md px-4 sm:px-6 z-40"
+            className="fixed bottom-6 left-[calc(50%-150px)] sm:left-1/2 -translate-x-1/2 w-full max-w-md px-4 sm:px-6 z-40"
           >
             <ProductCard
               product={product}
               onTake={handleTakeProduct}
               onAnother={isBlocked ? undefined : handleAnotherDrop}
               onCustom={handleCustomOrder}
+              onClose={() => setProduct(null)}
             />
           </motion.div>
         )}
