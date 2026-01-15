@@ -10,8 +10,11 @@ import { useTreeEmotion } from '@/hooks/useTreeEmotion';
 import { useDialogueVariant } from '@/hooks/useDialogueVariant';
 import { useTreePersonality } from '@/hooks/useTreePersonality';
 import { useTimeout } from '@/hooks/useTimeout';
+import { useDigression } from '@/hooks/useDigression';
 import { retryPhrases } from '@/data/dialogues';
+import { calculateReactionTime } from '@/utils/timing';
 import type { DialogueStep, UserPreferences, Product } from '@/types/dialogue';
+import type { Digression } from '@/data/digressions';
 
 export default function Home() {
   const { emotion, greet, think, celebrate, present, reset } = useTreeEmotion();
@@ -24,6 +27,12 @@ export default function Home() {
     resetRetry,
     resetPersonality 
   } = useTreePersonality();
+  const { 
+    shouldDigress, 
+    getRandomDigression, 
+    currentDigression, 
+    setCurrentDigression 
+  } = useDigression();
 
   const [step, setStep] = useState<DialogueStep>('welcome');
   const [preferences, setPreferences] = useState<UserPreferences>({});
@@ -34,29 +43,79 @@ export default function Home() {
   const [isTalking, setIsTalking] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [showTimeoutMessage, setShowTimeoutMessage] = useState(false);
+  const [isDigressing, setIsDigressing] = useState(false);
+  const [digressionButtons, setDigressionButtons] = useState<Digression['buttons']>([]);
+  const [nextStepAfterDigression, setNextStepAfterDigression] = useState<DialogueStep | null>(null);
+
+  // Функция показа отвлечения
+  const showDigression = useCallback((nextStep: DialogueStep) => {
+    const digression = getRandomDigression(personality);
+    
+    if (!digression) {
+      proceedToNextStep(nextStep);
+      return;
+    }
+
+    setCurrentDigression(digression);
+    setIsDigressing(true);
+    setMessage(digression.message);
+    setNextStepAfterDigression(nextStep);
+    
+    if (digression.buttons) {
+      setDigressionButtons(digression.buttons);
+    } else if (digression.autoAdvance) {
+      const readTime = calculateReactionTime(digression.message);
+      setTimeout(() => {
+        setIsDigressing(false);
+        setDigressionButtons([]);
+        proceedToNextStep(nextStep);
+      }, readTime);
+    }
+  }, [personality, getRandomDigression, setCurrentDigression]);
+
+  // Обработка ответа на отвлечение
+  const handleDigressionResponse = useCallback((responseText: string) => {
+    setMessage(responseText);
+    setDigressionButtons([]);
+    
+    const readTime = calculateReactionTime(responseText);
+    setTimeout(() => {
+      setIsDigressing(false);
+      if (nextStepAfterDigression) {
+        proceedToNextStep(nextStepAfterDigression);
+      }
+    }, readTime);
+  }, [nextStepAfterDigression]);
+
+  // Переход к следующему шагу
+  const proceedToNextStep = useCallback((nextStep: DialogueStep) => {
+    setStep(nextStep);
+    const nextMessage = getVariant(nextStep, personality);
+    setMessage(nextMessage);
+    reset();
+    resetTimeout();
+  }, [getVariant, personality, reset, resetTimeout]);
 
   // Таймаут на бездействие (15 секунд)
   const handleTimeout = useCallback(() => {
-    if (!showTimeoutMessage && !loading && step !== 'welcome' && step !== 'contact' && step !== 'reveal') {
+    if (!showTimeoutMessage && !loading && step !== 'welcome' && step !== 'contact' && step !== 'reveal' && !isDigressing) {
       const timeoutPhrase = getTimeoutPhrase(step);
       setShowTimeoutMessage(true);
       
-      // Временно показываем фразу таймаута
       const originalMessage = message;
       setMessage(timeoutPhrase);
       
-      // Через 3 секунды возвращаем оригинальное сообщение
       setTimeout(() => {
         setMessage(originalMessage);
         setShowTimeoutMessage(false);
       }, 3000);
     }
-  }, [showTimeoutMessage, loading, step, getTimeoutPhrase, message]);
+  }, [showTimeoutMessage, loading, step, getTimeoutPhrase, message, isDigressing]);
 
   const { resetTimeout, clearTimer } = useTimeout({
-    timeout: 15000, // 15 секунд
+    timeout: 15000,
     onTimeout: handleTimeout,
-    enabled: !loading && !isTalking && step !== 'welcome' && step !== 'contact'
+    enabled: !loading && !isTalking && step !== 'welcome' && step !== 'contact' && !isDigressing
   });
 
   // Инициализация приветствия
@@ -87,55 +146,58 @@ export default function Home() {
     resetTimeout();
     setPreferences({ ...preferences, mood });
     
-    // Показываем реакцию
     const reaction = getReaction('mood', mood, personality);
     setMessage(reaction);
     celebrate();
 
+    const reactionTime = calculateReactionTime(reaction);
+
     setTimeout(() => {
-      setStep('location');
-      const locationMessage = getVariant('location', personality);
-      setMessage(locationMessage);
-      reset();
-      resetTimeout();
-    }, 1500);
-  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
+      if (shouldDigress()) {
+        showDigression('location');
+      } else {
+        proceedToNextStep('location');
+      }
+    }, reactionTime);
+  }, [preferences, getReaction, personality, celebrate, resetTimeout, shouldDigress, showDigression, proceedToNextStep]);
 
   const handleLocationSelect = useCallback((location: 'home' | 'office' | 'gift' | 'cafe') => {
     resetTimeout();
     setPreferences({ ...preferences, location });
     
-    // Показываем реакцию
     const reaction = getReaction('location', location, personality);
     setMessage(reaction);
     celebrate();
 
+    const reactionTime = calculateReactionTime(reaction);
+
     setTimeout(() => {
-      setStep('size');
-      const sizeMessage = getVariant('size', personality);
-      setMessage(sizeMessage);
-      reset();
-      resetTimeout();
-    }, 1500);
-  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
+      if (shouldDigress()) {
+        showDigression('size');
+      } else {
+        proceedToNextStep('size');
+      }
+    }, reactionTime);
+  }, [preferences, getReaction, personality, celebrate, resetTimeout, shouldDigress, showDigression, proceedToNextStep]);
 
   const handleSizeSelect = useCallback((size: 'small' | 'medium' | 'large') => {
     resetTimeout();
     setPreferences({ ...preferences, size });
     
-    // Показываем реакцию
     const reaction = getReaction('size', size, personality);
     setMessage(reaction);
     celebrate();
 
+    const reactionTime = calculateReactionTime(reaction);
+
     setTimeout(() => {
-      setStep('style');
-      const styleMessage = getVariant('style', personality);
-      setMessage(styleMessage);
-      reset();
-      resetTimeout();
-    }, 1500);
-  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
+      if (shouldDigress()) {
+        showDigression('style');
+      } else {
+        proceedToNextStep('style');
+      }
+    }, reactionTime);
+  }, [preferences, getReaction, personality, celebrate, resetTimeout, shouldDigress, showDigression, proceedToNextStep]);
 
   const handleStyleSelect = useCallback((style: 'warm' | 'industrial' | 'minimal') => {
     resetTimeout();
@@ -143,10 +205,11 @@ export default function Home() {
     const newPreferences = { ...preferences, style };
     setPreferences(newPreferences);
     
-    // Показываем реакцию
     const reaction = getReaction('style', style, personality);
     setMessage(reaction);
     think();
+
+    const reactionTime = calculateReactionTime(reaction);
 
     setTimeout(() => {
       setStep('reveal');
@@ -154,7 +217,7 @@ export default function Home() {
       setMessage(revealMessage);
       present();
       fetchProduct(newPreferences);
-    }, 1500);
+    }, reactionTime);
   }, [preferences, getReaction, getVariant, personality, think, present, resetTimeout, clearTimer]);
 
   const fetchProduct = async (prefs: UserPreferences) => {
@@ -193,12 +256,10 @@ export default function Home() {
   }, [resetRetry, getVariant, personality, think, clearTimer]);
 
   const handleAnotherDrop = useCallback(() => {
-    // Проверка лимита попыток
     if (retryCount >= 3) {
       setIsBlocked(true);
       setMessage(retryPhrases.limit);
       
-      // Блокировка на 10 секунд
       setTimeout(() => {
         setIsBlocked(false);
         resetRetry();
@@ -211,7 +272,6 @@ export default function Home() {
     setProduct(null);
     setStep('reveal');
     
-    // Выбираем сообщение в зависимости от количества попыток
     let retryMessage: string;
     if (retryCount === 0) {
       retryMessage = retryPhrases.first;
@@ -223,12 +283,14 @@ export default function Home() {
     
     setMessage(retryMessage);
     
+    const retryTime = calculateReactionTime(retryMessage);
+    
     setTimeout(() => {
       const revealRetryMessage = getVariant('revealRetry', personality);
       setMessage(revealRetryMessage);
       present();
       fetchProduct(preferences);
-    }, 1500);
+    }, retryTime);
   }, [retryCount, incrementRetry, resetRetry, getVariant, personality, present, preferences, resetTimeout]);
 
   const handleCustomOrder = useCallback(() => {
@@ -303,7 +365,19 @@ export default function Home() {
           />
         )}
 
-        {step === 'mood' && (
+        {/* Кнопки отвлечений */}
+        {isDigressing && digressionButtons && digressionButtons.length > 0 && (
+          <ChoiceButtons
+            key="digression"
+            choices={digressionButtons.map(btn => ({
+              label: btn.label,
+              onClick: () => handleDigressionResponse(btn.response),
+              variant: btn.label === 'Пропустим' ? 'ghost' : 'default'
+            }))}
+          />
+        )}
+
+        {step === 'mood' && !isDigressing && (
           <ChoiceButtons
             choices={[
               { label: 'Спокойное', emoji: '🍃', onClick: () => handleMoodSelect('calm') },
@@ -313,7 +387,7 @@ export default function Home() {
           />
         )}
 
-        {step === 'location' && (
+        {step === 'location' && !isDigressing && (
           <ChoiceButtons
             choices={[
               { label: 'Дом', emoji: '🏠', onClick: () => handleLocationSelect('home') },
@@ -324,7 +398,7 @@ export default function Home() {
           />
         )}
 
-        {step === 'size' && (
+        {step === 'size' && !isDigressing && (
           <ChoiceButtons
             choices={[
               { label: 'Компактное', emoji: 'S', onClick: () => handleSizeSelect('small') },
@@ -334,7 +408,7 @@ export default function Home() {
           />
         )}
 
-        {step === 'style' && (
+        {step === 'style' && !isDigressing && (
           <ChoiceButtons
             choices={[
               { label: 'Тёплое дерево', emoji: '🌳', onClick: () => handleStyleSelect('warm') },

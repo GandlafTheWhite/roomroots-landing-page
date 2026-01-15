@@ -67,6 +67,14 @@ export const dialogues: Record<string, StepDialogue> = {
         text: "Отлично! Давай разберёмся с твоим настроением. Какое оно?",
         mood: "playful",
       },
+      {
+        text: "Ну так... Какое у тебя сейчас состояние души?",
+        mood: "wise",
+      },
+      {
+        text: "Я вот преисполнился и понял, что настроение — это всё! Какое у тебя?",
+        mood: "wise",
+      },
     ],
     reactions: {
       calm: [
