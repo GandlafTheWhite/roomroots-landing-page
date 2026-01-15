@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TreeScene from '@/components/TreeScene';
 import ProductCard from '@/components/ProductCard';
@@ -7,10 +7,24 @@ import DialogueBubble from '@/components/DialogueBubble';
 import ChoiceButtons from '@/components/ChoiceButtons';
 import LoadingIndicator from '@/components/LoadingIndicator';
 import { useTreeEmotion } from '@/hooks/useTreeEmotion';
+import { useDialogueVariant } from '@/hooks/useDialogueVariant';
+import { useTreePersonality } from '@/hooks/useTreePersonality';
+import { useTimeout } from '@/hooks/useTimeout';
+import { retryPhrases } from '@/data/dialogues';
 import type { DialogueStep, UserPreferences, Product } from '@/types/dialogue';
 
 export default function Home() {
   const { emotion, greet, think, celebrate, present, reset } = useTreeEmotion();
+  const { getVariant, getReaction, getTimeoutPhrase } = useDialogueVariant();
+  const { 
+    personality, 
+    retryCount, 
+    isReturningUser,
+    incrementRetry, 
+    resetRetry,
+    resetPersonality 
+  } = useTreePersonality();
+
   const [step, setStep] = useState<DialogueStep>('welcome');
   const [preferences, setPreferences] = useState<UserPreferences>({});
   const [message, setMessage] = useState('');
@@ -18,63 +32,130 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showDialogue, setShowDialogue] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [showTimeoutMessage, setShowTimeoutMessage] = useState(false);
 
+  // Таймаут на бездействие (15 секунд)
+  const handleTimeout = useCallback(() => {
+    if (!showTimeoutMessage && !loading && step !== 'welcome' && step !== 'contact' && step !== 'reveal') {
+      const timeoutPhrase = getTimeoutPhrase(step);
+      setShowTimeoutMessage(true);
+      
+      // Временно показываем фразу таймаута
+      const originalMessage = message;
+      setMessage(timeoutPhrase);
+      
+      // Через 3 секунды возвращаем оригинальное сообщение
+      setTimeout(() => {
+        setMessage(originalMessage);
+        setShowTimeoutMessage(false);
+      }, 3000);
+    }
+  }, [showTimeoutMessage, loading, step, getTimeoutPhrase, message]);
+
+  const { resetTimeout, clearTimer } = useTimeout({
+    timeout: 15000, // 15 секунд
+    onTimeout: handleTimeout,
+    enabled: !loading && !isTalking && step !== 'welcome' && step !== 'contact'
+  });
+
+  // Инициализация приветствия
   useEffect(() => {
     if (step === 'welcome') {
-      setTimeout(() => setShowDialogue(true), 500);
+      setTimeout(() => {
+        const welcomeStep = isReturningUser ? 'welcomeReturning' : 'welcome';
+        const welcomeMessage = getVariant(welcomeStep, personality);
+        setMessage(welcomeMessage);
+        setShowDialogue(true);
+      }, 500);
     }
-  }, [step]);
+  }, [step, isReturningUser, getVariant, personality]);
 
   const handleStart = () => {
+    resetTimeout();
     greet();
     setTimeout(() => {
       setStep('mood');
-      setMessage('Окей! Слушай, какая у тебя сейчас вайб-энергия?');
+      const moodMessage = getVariant('mood', personality);
+      setMessage(moodMessage);
       think();
+      resetTimeout();
     }, 1000);
   };
 
-  const handleMoodSelect = (mood: 'calm' | 'vibrant' | 'minimal') => {
+  const handleMoodSelect = useCallback((mood: 'calm' | 'vibrant' | 'minimal') => {
+    resetTimeout();
     setPreferences({ ...preferences, mood });
+    
+    // Показываем реакцию
+    const reaction = getReaction('mood', mood, personality);
+    setMessage(reaction);
     celebrate();
+
     setTimeout(() => {
       setStep('location');
-      setMessage('О, круто! А где ты проводишь больше времени?');
+      const locationMessage = getVariant('location', personality);
+      setMessage(locationMessage);
       reset();
+      resetTimeout();
     }, 1500);
-  };
+  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
 
-  const handleLocationSelect = (location: 'home' | 'office' | 'gift' | 'cafe') => {
+  const handleLocationSelect = useCallback((location: 'home' | 'office' | 'gift' | 'cafe') => {
+    resetTimeout();
     setPreferences({ ...preferences, location });
+    
+    // Показываем реакцию
+    const reaction = getReaction('location', location, personality);
+    setMessage(reaction);
     celebrate();
+
     setTimeout(() => {
       setStep('size');
-      setMessage('Ага, понял. У тебя много места или компактно живёшь?');
+      const sizeMessage = getVariant('size', personality);
+      setMessage(sizeMessage);
       reset();
+      resetTimeout();
     }, 1500);
-  };
+  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
 
-  const handleSizeSelect = (size: 'small' | 'medium' | 'large') => {
+  const handleSizeSelect = useCallback((size: 'small' | 'medium' | 'large') => {
+    resetTimeout();
     setPreferences({ ...preferences, size });
+    
+    // Показываем реакцию
+    const reaction = getReaction('size', size, personality);
+    setMessage(reaction);
     celebrate();
+
     setTimeout(() => {
       setStep('style');
-      setMessage('Последний вопросик: какая у тебя обстановка?');
+      const styleMessage = getVariant('style', personality);
+      setMessage(styleMessage);
       reset();
+      resetTimeout();
     }, 1500);
-  };
+  }, [preferences, getReaction, getVariant, personality, celebrate, reset, resetTimeout]);
 
-  const handleStyleSelect = (style: 'warm' | 'industrial' | 'minimal') => {
+  const handleStyleSelect = useCallback((style: 'warm' | 'industrial' | 'minimal') => {
+    resetTimeout();
+    clearTimer();
     const newPreferences = { ...preferences, style };
     setPreferences(newPreferences);
+    
+    // Показываем реакцию
+    const reaction = getReaction('style', style, personality);
+    setMessage(reaction);
     think();
+
     setTimeout(() => {
       setStep('reveal');
-      setMessage('Окей, я кое-что нашёл... Дай-ка я потрясу ветки!');
+      const revealMessage = getVariant('reveal', personality);
+      setMessage(revealMessage);
       present();
       fetchProduct(newPreferences);
     }, 1500);
-  };
+  }, [preferences, getReaction, getVariant, personality, think, present, resetTimeout, clearTimer]);
 
   const fetchProduct = async (prefs: UserPreferences) => {
     setLoading(true);
@@ -102,41 +183,84 @@ export default function Home() {
     }
   }, [product, step, reset]);
 
-  const handleTakeProduct = () => {
+  const handleTakeProduct = useCallback(() => {
+    clearTimer();
+    resetRetry();
     setStep('contact');
-    setMessage('Отлично! Как с тобой связаться?');
+    const contactMessage = getVariant('contact', personality);
+    setMessage(contactMessage);
     think();
-  };
+  }, [resetRetry, getVariant, personality, think, clearTimer]);
 
-  const handleAnotherDrop = () => {
+  const handleAnotherDrop = useCallback(() => {
+    // Проверка лимита попыток
+    if (retryCount >= 3) {
+      setIsBlocked(true);
+      setMessage(retryPhrases.limit);
+      
+      // Блокировка на 10 секунд
+      setTimeout(() => {
+        setIsBlocked(false);
+        resetRetry();
+      }, 10000);
+      return;
+    }
+
+    resetTimeout();
+    incrementRetry();
     setProduct(null);
     setStep('reveal');
-    setMessage('Ещё разок потрясу ветки!');
-    present();
-    fetchProduct(preferences);
-  };
+    
+    // Выбираем сообщение в зависимости от количества попыток
+    let retryMessage: string;
+    if (retryCount === 0) {
+      retryMessage = retryPhrases.first;
+    } else if (retryCount === 1) {
+      retryMessage = retryPhrases.second;
+    } else {
+      retryMessage = retryPhrases.third;
+    }
+    
+    setMessage(retryMessage);
+    
+    setTimeout(() => {
+      const revealRetryMessage = getVariant('revealRetry', personality);
+      setMessage(revealRetryMessage);
+      present();
+      fetchProduct(preferences);
+    }, 1500);
+  }, [retryCount, incrementRetry, resetRetry, getVariant, personality, present, preferences, resetTimeout]);
 
-  const handleCustomOrder = () => {
+  const handleCustomOrder = useCallback(() => {
+    clearTimer();
+    resetRetry();
     setStep('contact');
-    setMessage('Круто! Расскажи, что хочешь');
+    const contactCustomMessage = getVariant('contactCustom', personality);
+    setMessage(contactCustomMessage);
     think();
-  };
+  }, [resetRetry, getVariant, personality, think, clearTimer]);
 
-  const handleContactSuccess = () => {
+  const handleContactSuccess = useCallback(() => {
+    const isGrumpy = personality === 'grumpy' || retryCount > 2;
+    const thankYouStep = isGrumpy ? 'thankYouGrumpy' : 'thankYou';
+    
     setStep('welcome');
-    setMessage('');
     setPreferences({});
     setProduct(null);
     celebrate();
+    
     setTimeout(() => {
-      setMessage('Спасибо! Скоро свяжемся 🌿');
+      const thankYouMessage = getVariant(thankYouStep, personality);
+      setMessage(thankYouMessage);
       setShowDialogue(true);
     }, 500);
+    
     setTimeout(() => {
       reset();
+      resetPersonality();
       setShowDialogue(false);
-    }, 3000);
-  };
+    }, 4000);
+  }, [personality, retryCount, getVariant, celebrate, reset, resetPersonality]);
 
   return (
     <div className="w-full min-h-screen h-screen flex items-center justify-center overflow-hidden relative touch-none">
@@ -147,14 +271,14 @@ export default function Home() {
 
       {/* Диалоговое облачко */}
       <AnimatePresence mode="wait">
-        {step === 'welcome' && showDialogue && (
-          <DialogueBubble message="Хэй-хэй! Я тут живу 🌿\n\nЗнаешь, я видел столько интересного в этих краях... Хочешь, покажу что-нибудь крутое?" show={true} onTypingChange={setIsTalking} />
+        {showDialogue && message && (
+          <DialogueBubble 
+            key={step} 
+            message={message} 
+            show={true} 
+            onTypingChange={setIsTalking} 
+          />
         )}
-        {step === 'mood' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
-        {step === 'location' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
-        {step === 'size' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
-        {step === 'style' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
-        {step === 'reveal' && <DialogueBubble message={message} show={true} onTypingChange={setIsTalking} />}
         {step === 'contact' && (
           <DialogueBubble message={message} show={true} onTypingChange={setIsTalking}>
             <ContactForm
@@ -229,16 +353,17 @@ export default function Home() {
             <ProductCard
               product={product}
               onTake={handleTakeProduct}
-              onAnother={handleAnotherDrop}
+              onAnother={isBlocked ? undefined : handleAnotherDrop}
               onCustom={handleCustomOrder}
             />
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Индикатор загрузки */}
-      <AnimatePresence>
-        {loading && <LoadingIndicator />}
+        {loading && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <LoadingIndicator />
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );
